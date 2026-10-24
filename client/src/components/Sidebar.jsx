@@ -5,7 +5,7 @@ const Sidebar = () => {
   const menuItems = [
     { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/' },
     { name: 'Predict Dropout', icon: <Users size={20} />, path: '/predict' },
-    { name: 'Reports (Coming Soon)', icon: <FileBarChart size={20} />, path: '#' },
+    { name: 'City Insights', icon: <FileBarChart size={20} />, path: '/city-analytics' },
     { name: 'Settings', icon: <Settings size={20} />, path: '#' },
   ];
 
