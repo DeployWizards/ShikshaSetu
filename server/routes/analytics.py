@@ -11,23 +11,32 @@ def get_dashboard_analytics():
     total_students = len(df)
     total_dropouts = int(df['Will_Dropout'].sum())
     
-    # District Stats
+    # 1. District Stats
     dist = df.groupby('City')['Will_Dropout'].agg(['count', 'sum']).reset_index()
     dist.columns = ['city', 'Total', 'Dropout']
     dist['Safe'] = dist['Total'] - dist['Dropout']
     district_data = dist.sort_values(by='Total', ascending=False).head(6)[['city', 'Safe', 'Dropout']].to_dict(orient='records')
     
-    # Income Stats
+    # 2. Income Stats
     inc = df.groupby('Family_Income')['Will_Dropout'].agg(['count', 'sum']).reset_index()
     inc['DropoutRate'] = round((inc['sum'] / inc['count']) * 100, 1)
     inc.rename(columns={'Family_Income': 'income'}, inplace=True)
+    income_order = {'< 1 Lakh': 1, '1-3 Lakhs': 2, '3-5 Lakhs': 3, '> 5 Lakhs': 4}
+    inc['order'] = inc['income'].map(income_order)
+    inc = inc.sort_values('order')
     income_data = inc[['income', 'DropoutRate']].to_dict(orient='records')
     
-    # Region Stats
+    # 3. Region Stats
     reg = df[df['Will_Dropout'] == 1]['Region'].value_counts().reset_index()
     reg.columns = ['name', 'value']
     reg['value'] = round((reg['value'] / total_dropouts) * 100, 1)
     
+    # 4. Gender Stats (THIS WAS MISSING!)
+    gen = df.groupby('Gender')['Will_Dropout'].agg(['count', 'sum']).reset_index()
+    gen.columns = ['gender', 'Total', 'Dropout']
+    gen['Safe'] = gen['Total'] - gen['Dropout']
+    gender_data = gen[['gender', 'Safe', 'Dropout']].to_dict(orient='records')
+
     return {
         "kpi": {
             "total_students": total_students,
@@ -38,9 +47,11 @@ def get_dashboard_analytics():
         "charts": {
             "district": district_data,
             "income": income_data,
-            "region": reg.to_dict(orient='records')
+            "region": reg.to_dict(orient='records'),
+            "gender": gender_data  # NOW IT WILL WORK!
         }
     }
+
 
 @router.get("/cities")
 def get_cities_list():
