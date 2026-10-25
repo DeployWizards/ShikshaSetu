@@ -28,9 +28,19 @@ def predict_dropout(data: StudentData):
     student_dict = data.dict()
     input_df = pd.DataFrame([student_dict])
     
-    prediction = model.predict(input_df)[0]
-    probability = model.predict_proba(input_df)[0][1] 
+    prediction = int(model.predict(input_df)[0])
     
+    # Safely extract probability
+    try:
+        proba_array = model.predict_proba(input_df)
+        if proba_array.ndim == 2 and proba_array.shape[1] > 1:
+            probability = float(proba_array[0][1])
+        else:
+            probability = float(proba_array[0])
+    except Exception:
+        # Fallback if model doesn't support predict_proba
+        probability = float(prediction)
+
     if probability > 0.65:
         risk = "High Risk"
     elif probability > 0.40:
@@ -39,7 +49,7 @@ def predict_dropout(data: StudentData):
         risk = "Low Risk / Safe"
 
     return {
-        "prediction": int(prediction),
+        "prediction": prediction,
         "dropout_probability": round(probability * 100, 2),
         "risk_status": risk,
     }
