@@ -10,11 +10,11 @@ const MLReports = () => {
     <div className="max-w-7xl mx-auto pb-10">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-800">Machine Learning Analytics</h1>
-        <p className="text-gray-500 mt-1">Exploratory Data Analysis and Model Evaluation Metrics</p>
+        <p className="text-gray-500 mt-1">Exploratory Data Analysis, Feature Engineering, and Model Evaluation</p>
       </div>
 
       {/* Tabs */}
-      <div className="flex space-x-4 border-b border-gray-200 mb-8">
+      <div className="flex flex-wrap gap-2 border-b border-gray-200 mb-8">
         <button 
           className={`pb-3 font-bold text-sm px-4 ${activeTab === 'eda' ? 'border-b-4 border-blue-600 text-blue-700' : 'text-gray-500 hover:text-gray-700'}`}
           onClick={() => setActiveTab('eda')}
@@ -22,14 +22,20 @@ const MLReports = () => {
           Exploratory Data Analysis (EDA)
         </button>
         <button 
+          className={`pb-3 font-bold text-sm px-4 ${activeTab === 'pca' ? 'border-b-4 border-blue-600 text-blue-700' : 'text-gray-500 hover:text-gray-700'}`}
+          onClick={() => setActiveTab('pca')}
+        >
+          Feature Engineering & PCA
+        </button>
+        <button 
           className={`pb-3 font-bold text-sm px-4 ${activeTab === 'models' ? 'border-b-4 border-blue-600 text-blue-700' : 'text-gray-500 hover:text-gray-700'}`}
           onClick={() => setActiveTab('models')}
         >
-          Algorithm Performance & Confusion Matrices
+          Algorithm Performance
         </button>
       </div>
 
-      {/* EDA Section */}
+      {/* 1. EDA Section */}
       {activeTab === 'eda' && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
@@ -51,10 +57,25 @@ const MLReports = () => {
         </div>
       )}
 
-      {/* Models Section */}
+      {/* 2. Feature Engineering & PCA Section (NEW) */}
+      {activeTab === 'pca' && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <h3 className="text-center font-bold text-gray-700 mb-2">PCA: Dimensionality Reduction</h3>
+            <p className="text-xs text-gray-500 text-center mb-4">Shows that 90% of the variance can be explained without using all 35 features, proving that the extra 20 features are mostly noise.</p>
+            <img src={`${BASE_URL}/5_pca_variance_plot.png`} alt="PCA Variance Plot" className="w-full h-auto object-contain rounded-lg" />
+          </div>
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <h3 className="text-center font-bold text-gray-700 mb-2">Random Forest: Feature Importance</h3>
+            <p className="text-xs text-gray-500 text-center mb-4">Highlights the most critical factors for dropout. Notice how the newly added 20 environmental attributes rank at the very bottom.</p>
+            <img src={`${BASE_URL}/6_feature_importance.png`} alt="Feature Importance" className="w-full h-auto object-contain rounded-lg" />
+          </div>
+        </div>
+      )}
+
+      {/* 3. Models Section */}
       {activeTab === 'models' && (
         <div>
-          {/* Final Comparison Chart */}
           <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-8 max-w-4xl mx-auto">
             <h3 className="text-center font-bold text-gray-700 mb-2">Final Model Accuracy Comparison</h3>
             <img src={`${BASE_URL}/model_results/Final_Model_Comparison.png`} alt="Model Comparison" className="w-full h-auto object-contain rounded-lg" />
