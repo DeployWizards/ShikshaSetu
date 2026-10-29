@@ -18,8 +18,17 @@ print("Loading dataset...")
 # 1. Load Data
 df = pd.read_csv("up_student_dropout_data.csv")
 
-# 2. Separate Features (X) and Target (y)
-X = df.drop(columns=['Student_ID', 'City', 'Will_Dropout'])
+other_features = [
+    "Extracurricular_Participation", "Scholarship_Received", "Transport_Availability", 
+    "Library_Access", "Peer_Academic_Support", "School_Counselling_Access", 
+    "Sleep_Hours_Per_Night", "Screen_Time_Hours", "Water_Intake_Liters", 
+    "Daily_Commute_Time_Mins", "Fast_Food_Frequency", "Has_Best_Friend", 
+    "Social_Media_Usage", "Favorite_Subject_Type", "Has_Pets",
+    "Teacher_Student_Ratio", "Classroom_Ventilation", "Playground_Size",
+    "Participates_In_Festivals", "School_Building_Quality"
+]
+
+X = df.drop(columns=['Student_ID', 'City', 'Will_Dropout'] + other_features)
 y = df['Will_Dropout']
 
 # 3. Define Categorical and Numerical columns
@@ -92,6 +101,10 @@ y_pred_custom = (y_probs >= custom_threshold).astype(int)
 print(f"\nClassification Report (Custom Threshold {custom_threshold}):")
 print(classification_report(y_test, y_pred_custom))
 
-# 9. Save the Final Model
-joblib.dump(master_pipeline, 'optimized_dropout_model.pkl')
-print("\nOptimized Master Ensemble Model saved as 'optimized_dropout_model.pkl'")
+
+try:
+    joblib.dump(master_pipeline, '../server/dropout_model.pkl')
+    print("\nOptimized Master Ensemble Model saved successfully to '../server/dropout_model.pkl'")
+except:
+    joblib.dump(master_pipeline, 'dropout_model.pkl')
+    print("\nOptimized Master Ensemble Model saved locally as 'dropout_model.pkl'")
