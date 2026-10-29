@@ -3,7 +3,7 @@ import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import Prediction from './pages/Prediction';
 import CityAnalytics from './pages/CityAnalytics'; // Import new page
-
+import BulkUpload from './pages/BulkUpload';
 function App() {
   return (
     <Router>
@@ -11,7 +11,8 @@ function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
           <Route path="predict" element={<Prediction />} />
-          <Route path="city-analytics" element={<CityAnalytics />} /> {/* New Route */}
+          <Route path="city-analytics" element={<CityAnalytics />} />
+          <Route path="bulk-upload" element={<BulkUpload />} />
         </Route>
       </Routes>
     </Router>

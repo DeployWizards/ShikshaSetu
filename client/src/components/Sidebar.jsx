@@ -1,11 +1,12 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Users, FileBarChart, Settings } from 'lucide-react';
+import { LayoutDashboard, Users, FileBarChart, Settings,FileText } from 'lucide-react';
 
 const Sidebar = () => {
   const menuItems = [
     { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/' },
     { name: 'Predict Dropout', icon: <Users size={20} />, path: '/predict' },
     { name: 'City Insights', icon: <FileBarChart size={20} />, path: '/city-analytics' },
+    { name: 'Bulk Upload', icon: <FileText size={20} />, path: '/bulk-upload' },
     { name: 'Settings', icon: <Settings size={20} />, path: '#' },
   ];
 
