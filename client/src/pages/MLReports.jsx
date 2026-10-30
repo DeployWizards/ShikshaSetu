@@ -62,12 +62,12 @@ const MLReports = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
             <h3 className="text-center font-bold text-gray-700 mb-2">PCA: Dimensionality Reduction</h3>
-            <p className="text-xs text-gray-500 text-center mb-4">Shows that 90% of the variance can be explained without using all 35 features, proving that the extra 20 features are mostly noise.</p>
+            <p className="text-xs text-gray-500 text-center mb-4">Real PCA on all 32 attributes. The curve rises almost linearly, so nearly every component is needed to reach 90% of the variance: the attributes are largely independent, and PCA cannot compress away the 20 extra ones. The model therefore uses 12 features chosen by importance instead.</p>
             <img src={`${BASE_URL}/5_pca_variance_plot.png`} alt="PCA Variance Plot" className="w-full h-auto object-contain rounded-lg" />
           </div>
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
             <h3 className="text-center font-bold text-gray-700 mb-2">Random Forest: Feature Importance</h3>
-            <p className="text-xs text-gray-500 text-center mb-4">Highlights the most critical factors for dropout. Notice how the newly added 20 environmental attributes rank at the very bottom.</p>
+            <p className="text-xs text-gray-500 text-center mb-4">Highlights the most critical factors for dropout: attendance, family income and distance lead. Daily commute time ranks high only because it is calculated from distance; the other added attributes score close to zero.</p>
             <img src={`${BASE_URL}/6_feature_importance.png`} alt="Feature Importance" className="w-full h-auto object-contain rounded-lg" />
           </div>
         </div>

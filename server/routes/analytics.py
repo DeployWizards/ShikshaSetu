@@ -1,8 +1,20 @@
 from fastapi import APIRouter
 from services.data_service import get_dataframe
+import json
+import os
 
 router = APIRouter()
 df = get_dataframe()
+
+# Written by ml_model/train_multiple_models.py after each training run
+metrics_path = os.path.join(os.path.dirname(__file__), '..', '..', 'ml_model', 'model_metrics.json')
+
+def get_model_accuracy():
+    try:
+        with open(metrics_path) as f:
+            return json.load(f)["accuracy"]
+    except (OSError, KeyError, ValueError):
+        return None
 
 @router.get("/analytics")
 def get_dashboard_analytics():
@@ -42,7 +54,7 @@ def get_dashboard_analytics():
             "total_students": total_students,
             "total_dropouts": total_dropouts,
             "dropout_rate": round((total_dropouts / total_students) * 100, 1),
-            "accuracy": 88.0 
+            "accuracy": get_model_accuracy()
         },
         "charts": {
             "district": district_data,

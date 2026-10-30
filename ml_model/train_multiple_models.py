@@ -3,8 +3,9 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.compose import ColumnTransformer
-from sklearn.metrics import classification_report, precision_score, recall_score, f1_score
+from sklearn.metrics import classification_report, accuracy_score, precision_score, recall_score, f1_score
 import joblib
+import json
 
 # Import Models
 from sklearn.linear_model import LogisticRegression
@@ -102,9 +103,17 @@ print(f"\nClassification Report (Custom Threshold {custom_threshold}):")
 print(classification_report(y_test, y_pred_custom))
 
 
-try:
-    joblib.dump(master_pipeline, '../server/dropout_model.pkl')
-    print("\nOptimized Master Ensemble Model saved successfully to '../server/dropout_model.pkl'")
-except:
-    joblib.dump(master_pipeline, 'dropout_model.pkl')
-    print("\nOptimized Master Ensemble Model saved locally as 'dropout_model.pkl'")
+# 9. Save test-set metrics (default threshold 0.5) for the dashboard
+metrics = {
+    "accuracy": round(accuracy_score(y_test, y_pred_default) * 100, 1),
+    "precision": round(precision_score(y_test, y_pred_default) * 100, 1),
+    "recall": round(recall_score(y_test, y_pred_default) * 100, 1),
+    "f1": round(f1_score(y_test, y_pred_default) * 100, 1),
+}
+with open('model_metrics.json', 'w') as f:
+    json.dump(metrics, f, indent=2)
+print(f"\nTest metrics saved to 'model_metrics.json': {metrics}")
+
+# 10. Save the model where the server loads it (server/services/ml_service.py)
+joblib.dump(master_pipeline, 'dropout_model.pkl')
+print("Optimized Master Ensemble Model saved to 'ml_model/dropout_model.pkl'")
