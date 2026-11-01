@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from services.data_service import get_dataframe
+import pandas as pd
 import json
 import os
 
@@ -15,6 +16,23 @@ def get_model_accuracy():
             return json.load(f)["accuracy"]
     except (OSError, KeyError, ValueError):
         return None
+
+# Numeric attributes are grouped into bands before computing dropout rates
+NUMERIC_BANDS = {
+    'Attendance_Percentage': ([0, 50, 60, 70, 80, 90, 101], ['<50', '50-60', '60-70', '70-80', '80-90', '90+']),
+    'Distance_km': ([0, 5, 10, 15, 20, 1000], ['0-5', '5-10', '10-15', '15-20', '20+']),
+    'Class_11_Percentage': ([0, 45, 55, 65, 75, 85, 101], ['<45', '45-55', '55-65', '65-75', '75-85', '85+']),
+}
+
+def banded(col):
+    bins, labels = NUMERIC_BANDS[col]
+    return pd.cut(df[col], bins=bins, labels=labels, right=False)
+
+def dropout_rate_by(key, order=None):
+    # Dropout rate (%) and student count for each group of `key` (a column name or a Series)
+    grp = df.groupby(df[key] if isinstance(key, str) else key, observed=True)['Will_Dropout'].agg(['count', 'mean'])
+    if order: grp = grp.reindex(order)
+    return [{"group": str(g), "DropoutRate": round(r['mean'] * 100, 1), "Total": int(r['count'])} for g, r in grp.iterrows()]
 
 @router.get("/analytics")
 def get_dashboard_analytics():
@@ -49,6 +67,30 @@ def get_dashboard_analytics():
     gen['Safe'] = gen['Total'] - gen['Dropout']
     gender_data = gen[['gender', 'Safe', 'Dropout']].to_dict(orient='records')
 
+    # 5-8. Dropout rate across attendance, distance, Class 11 marks and siblings
+    attendance_data = dropout_rate_by(banded('Attendance_Percentage'))
+    distance_data = dropout_rate_by(banded('Distance_km'))
+    marks_data = dropout_rate_by(banded('Class_11_Percentage'))
+    siblings_data = dropout_rate_by('No_of_Siblings')
+
+    # 9. Father vs Mother education, side by side
+    edu_order = ['Illiterate', '10th Pass', '12th Pass', 'Graduate']
+    father = {d['group']: d['DropoutRate'] for d in dropout_rate_by('Father_Education', edu_order)}
+    mother = {d['group']: d['DropoutRate'] for d in dropout_rate_by('Mother_Education', edu_order)}
+    parent_edu_data = [{"education": e, "Father": father[e], "Mother": mother[e]} for e in edu_order]
+
+    # 10. Which attributes matter: gap between the highest and lowest group dropout rate
+    gap_rows = []
+    for col in df.columns.drop(['Student_ID', 'City', 'Will_Dropout']):
+        if col in NUMERIC_BANDS:
+            rates = df.groupby(banded(col), observed=True)['Will_Dropout'].mean()
+        elif df[col].nunique() <= 6:
+            rates = df.groupby(col)['Will_Dropout'].mean()
+        else:
+            continue
+        gap_rows.append({"attribute": col.replace('_', ' '), "Gap": round((rates.max() - rates.min()) * 100, 1)})
+    gap_data = sorted(gap_rows, key=lambda r: r['Gap'], reverse=True)[:15]
+
     return {
         "kpi": {
             "total_students": total_students,
@@ -60,7 +102,13 @@ def get_dashboard_analytics():
             "district": district_data,
             "income": income_data,
             "region": reg.to_dict(orient='records'),
-            "gender": gender_data  # NOW IT WILL WORK!
+            "gender": gender_data,  # NOW IT WILL WORK!
+            "attendance": attendance_data,
+            "distance": distance_data,
+            "marks": marks_data,
+            "siblings": siblings_data,
+            "parent_education": parent_edu_data,
+            "attribute_gap": gap_data
         }
     }
 

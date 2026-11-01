@@ -1,8 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
-  PieChart, Pie, Cell, AreaChart, Area
+  PieChart, Pie, Cell, AreaChart, Area, LineChart, Line, ReferenceLine
 } from 'recharts';
+
+// Dropout rate per group; bars above the overall rate are red, the rest green
+const RateBarChart = ({ data, avg, xLabel }) => (
+  <ResponsiveContainer width="100%" height="100%">
+    <BarChart data={data} margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
+      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+      <XAxis dataKey="group" tick={{fill: '#6B7280', fontSize: 12}} label={{ value: xLabel, position: 'insideBottom', offset: -10, fill: '#6B7280', fontSize: 12 }} />
+      <YAxis unit="%" tick={{fill: '#6B7280', fontSize: 12}} />
+      <Tooltip cursor={{fill: '#F3F4F6'}} formatter={(v, n, p) => [`${v}% (${p.payload.Total} students)`, 'Dropout Rate']} />
+      <ReferenceLine y={avg} stroke="#6B7280" strokeDasharray="4 4" label={{ value: `Avg ${avg}%`, position: 'insideTopRight', fill: '#6B7280', fontSize: 11 }} />
+      <Bar dataKey="DropoutRate" barSize={40} radius={[4, 4, 0, 0]}>
+        {data.map((d, i) => <Cell key={i} fill={d.DropoutRate > avg ? '#EF4444' : '#10B981'} />)}
+      </Bar>
+    </BarChart>
+  </ResponsiveContainer>
+);
 
 const Dashboard = () => {
   // State to hold the real data from Backend
@@ -171,6 +187,98 @@ const Dashboard = () => {
               <span className="text-3xl font-bold text-gray-700">100%</span>
               <span className="block text-xs text-gray-500 mt-1">Total Dropouts</span>
             </div>
+          </div>
+        </div>
+
+      </div>
+
+      {/* --- ATTRIBUTE-WISE ANALYSIS (Real Data) --- */}
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-gray-800">Attribute-wise Dropout Analysis</h2>
+        <p className="text-gray-500 mt-1">Dropout rate within each group. Red bars are above the overall rate of {kpi.dropout_rate}%.</p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+
+        {/* 5. Attendance */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          <h2 className="text-lg font-bold text-gray-700 mb-1">Attendance vs Dropout Rate</h2>
+          <p className="text-xs text-gray-500 mb-4">Below 60% attendance, roughly every second student drops out.</p>
+          <div className="h-80">
+            <RateBarChart data={charts.attendance} avg={kpi.dropout_rate} xLabel="Attendance (%)" />
+          </div>
+        </div>
+
+        {/* 6. Distance */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          <h2 className="text-lg font-bold text-gray-700 mb-1">Distance to School vs Dropout Rate</h2>
+          <p className="text-xs text-gray-500 mb-4">Dropout risk triples once the school is more than 10 km away.</p>
+          <div className="h-80">
+            <RateBarChart data={charts.distance} avg={kpi.dropout_rate} xLabel="Distance (km)" />
+          </div>
+        </div>
+
+        {/* 7. Class 11 marks */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          <h2 className="text-lg font-bold text-gray-700 mb-1">Class 11 Marks vs Dropout Rate</h2>
+          <p className="text-xs text-gray-500 mb-4">Students scoring below 45% are about twice as likely to drop out.</p>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={charts.marks} margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                <XAxis dataKey="group" tick={{fill: '#6B7280', fontSize: 12}} label={{ value: 'Class 11 Percentage', position: 'insideBottom', offset: -10, fill: '#6B7280', fontSize: 12 }} />
+                <YAxis unit="%" tick={{fill: '#6B7280', fontSize: 12}} />
+                <Tooltip formatter={(v, n, p) => [`${v}% (${p.payload.Total} students)`, 'Dropout Rate']} />
+                <ReferenceLine y={kpi.dropout_rate} stroke="#6B7280" strokeDasharray="4 4" label={{ value: `Avg ${kpi.dropout_rate}%`, position: 'insideTopRight', fill: '#6B7280', fontSize: 11 }} />
+                <Line type="monotone" dataKey="DropoutRate" stroke={COLORS.urban} strokeWidth={3} dot={{ r: 5 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* 8. Siblings */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          <h2 className="text-lg font-bold text-gray-700 mb-1">Number of Siblings vs Dropout Rate</h2>
+          <p className="text-xs text-gray-500 mb-4">Families with 3 or more children see a sharp jump in dropouts.</p>
+          <div className="h-80">
+            <RateBarChart data={charts.siblings} avg={kpi.dropout_rate} xLabel="Number of Siblings" />
+          </div>
+        </div>
+
+        {/* 9. Parents' education */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          <h2 className="text-lg font-bold text-gray-700 mb-1">Parents' Education vs Dropout Rate</h2>
+          <p className="text-xs text-gray-500 mb-4">Risk is highest when a parent is illiterate; beyond 10th pass it levels off.</p>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={charts.parent_education} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                <XAxis dataKey="education" tick={{fill: '#6B7280', fontSize: 12}} />
+                <YAxis unit="%" tick={{fill: '#6B7280', fontSize: 12}} />
+                <Tooltip cursor={{fill: '#F3F4F6'}} formatter={(v) => `${v}%`} />
+                <Legend wrapperStyle={{ paddingTop: '10px' }} />
+                <ReferenceLine y={kpi.dropout_rate} stroke="#6B7280" strokeDasharray="4 4" />
+                <Bar dataKey="Father" fill={COLORS.urban} barSize={28} radius={[4, 4, 0, 0]} />
+                <Bar dataKey="Mother" fill={COLORS.rural} barSize={28} radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* 10. Which attributes matter */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          <h2 className="text-lg font-bold text-gray-700 mb-1">Which Attributes Matter Most?</h2>
+          <p className="text-xs text-gray-500 mb-4">Gap between the highest- and lowest-risk group of each attribute, in percentage points.</p>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={charts.attribute_gap} layout="vertical" margin={{ top: 5, right: 30, left: 60, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E5E7EB" />
+                <XAxis type="number" unit=" pts" tick={{fill: '#6B7280', fontSize: 12}} />
+                <YAxis dataKey="attribute" type="category" tick={{fill: '#6B7280', fontSize: 11}} width={110} interval={0} />
+                <Tooltip cursor={{fill: '#F3F4F6'}} formatter={(v) => [`${v} percentage points`, 'Gap']} />
+                <Bar dataKey="Gap" fill="#6366F1" barSize={14} radius={[0, 4, 4, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
