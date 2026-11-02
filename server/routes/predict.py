@@ -93,10 +93,15 @@ async def bulk_predict(file: UploadFile = File(...)):
             else:
                 risk = "Safe"
                 
+            row = df.iloc[i]
             student_result = {
-                "id": df.iloc[i]['Student_ID'] if 'Student_ID' in df.columns else f"Student {i+1}",
-                "attendance": float(df.iloc[i]['Attendance_Percentage']),
-                "income": str(df.iloc[i]['Family_Income']),
+                "id": row['Student_ID'] if 'Student_ID' in df.columns else f"Student {i+1}",
+                "gender": str(row['Gender']),
+                "region": str(row['Region']),
+                "stream": str(row['Stream']),
+                "attendance": float(row['Attendance_Percentage']),
+                "class_11": float(row['Class_11_Percentage']),
+                "income": str(row['Family_Income']),
                 "prediction": int(predictions[i]),
                 "probability": round(prob * 100, 1),
                 "risk_status": risk

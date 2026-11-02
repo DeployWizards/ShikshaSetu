@@ -8,7 +8,6 @@ const Sidebar = () => {
     { name: 'City Insights', icon: <FileBarChart size={20} />, path: '/city-analytics' },
     { name: 'Bulk Upload', icon: <FileText size={20} />, path: '/bulk-upload' },
     { name: 'ML Reports', icon: <Activity size={20} />, path: '/ml-reports' },
-    { name: 'Settings', icon: <Settings size={20} />, path: '#' },
   ];
 
   return (

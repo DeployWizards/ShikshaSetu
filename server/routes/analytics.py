@@ -28,11 +28,19 @@ def banded(col):
     bins, labels = NUMERIC_BANDS[col]
     return pd.cut(df[col], bins=bins, labels=labels, right=False)
 
-def dropout_rate_by(key, order=None):
-    # Dropout rate (%) and student count for each group of `key` (a column name or a Series)
-    grp = df.groupby(df[key] if isinstance(key, str) else key, observed=True)['Will_Dropout'].agg(['count', 'mean'])
+def dropout_rate_by(key, order=None, frame=None):
+    # Dropout rate (%) and student count for each group of `key` (a column name or a Series).
+    # Defaults to the full dataframe; pass `frame` to scope it to a single city.
+    d = df if frame is None else frame
+    grp = d.groupby(d[key] if isinstance(key, str) else key, observed=True)['Will_Dropout'].agg(['count', 'mean'])
     if order: grp = grp.reindex(order)
-    return [{"group": str(g), "DropoutRate": round(r['mean'] * 100, 1), "Total": int(r['count'])} for g, r in grp.iterrows()]
+    return [{"group": str(g), "DropoutRate": round(r['mean'] * 100, 1), "Total": int(r['count'])}
+            for g, r in grp.iterrows() if not pd.isna(r['count'])]
+
+def banded_frame(frame, col):
+    # Same bands as `banded`, but for an arbitrary (city-scoped) frame
+    bins, labels = NUMERIC_BANDS[col]
+    return pd.cut(frame[col], bins=bins, labels=labels, right=False)
 
 @router.get("/analytics")
 def get_dashboard_analytics():
@@ -125,15 +133,25 @@ def get_city_analytics(city_name: str):
     city_df = df[df['City'] == city_name]
     if city_df.empty: return {"error": "City not found"}
 
+    total_students = len(city_df)
+    total_dropouts = int(city_df['Will_Dropout'].sum())
+    dropout_rate = round((total_dropouts / total_students) * 100, 1)
+
     # 1. Gender Stats
     gen = city_df.groupby('Gender')['Will_Dropout'].agg(['count', 'sum']).reset_index()
     gen.columns = ['gender', 'Total', 'Dropout']
     gen['Safe'] = gen['Total'] - gen['Dropout']
-    
+
     # 2. Region Stats (Urban vs Rural)
     reg = city_df.groupby('Region')['Will_Dropout'].agg(['count', 'sum']).reset_index()
     reg.columns = ['region', 'Total', 'Dropout']
     reg['Safe'] = reg['Total'] - reg['Dropout']
+
+    # Region share of dropouts (for the donut) - % of the city's dropouts in each area
+    reg_share = city_df[city_df['Will_Dropout'] == 1]['Region'].value_counts().reset_index()
+    reg_share.columns = ['name', 'value']
+    if total_dropouts > 0:
+        reg_share['value'] = round((reg_share['value'] / total_dropouts) * 100, 1)
 
     # 3. Income Stats (Dropout Rate)
     inc = city_df.groupby('Family_Income')['Will_Dropout'].agg(['count', 'sum']).reset_index()
@@ -144,20 +162,49 @@ def get_city_analytics(city_name: str):
     inc['order'] = inc['income'].map(income_order)
     inc = inc.sort_values('order')
 
-    # 4. Father's Education Stats (Dropout Rate)
-    edu = city_df.groupby('Father_Education')['Will_Dropout'].agg(['count', 'sum']).reset_index()
-    edu['DropoutRate'] = round((edu['sum'] / edu['count']) * 100, 1)
-    edu.rename(columns={'Father_Education': 'education'}, inplace=True)
-    
+    # 4. Parents' education (Father vs Mother), side by side
+    edu_order = ['Illiterate', '10th Pass', '12th Pass', 'Graduate']
+    father = {d['group']: d['DropoutRate'] for d in dropout_rate_by('Father_Education', edu_order, frame=city_df)}
+    mother = {d['group']: d['DropoutRate'] for d in dropout_rate_by('Mother_Education', edu_order, frame=city_df)}
+    parent_edu_data = [{"education": e, "Father": father.get(e, 0), "Mother": mother.get(e, 0)} for e in edu_order]
+
+    # 5-8. Dropout rate across attendance, distance, Class 11 marks and siblings (city-scoped)
+    attendance_data = dropout_rate_by(banded_frame(city_df, 'Attendance_Percentage'), frame=city_df)
+    distance_data = dropout_rate_by(banded_frame(city_df, 'Distance_km'), frame=city_df)
+    marks_data = dropout_rate_by(banded_frame(city_df, 'Class_11_Percentage'), frame=city_df)
+    siblings_data = dropout_rate_by('No_of_Siblings', frame=city_df)
+
+    # 9. Which attributes matter most within this city
+    gap_rows = []
+    for col in city_df.columns.drop(['Student_ID', 'City', 'Will_Dropout']):
+        if col in NUMERIC_BANDS:
+            rates = city_df.groupby(banded_frame(city_df, col), observed=True)['Will_Dropout'].mean()
+        elif city_df[col].nunique() <= 6:
+            rates = city_df.groupby(col)['Will_Dropout'].mean()
+        else:
+            continue
+        rates = rates.dropna()
+        if len(rates) < 2:
+            continue
+        gap_rows.append({"attribute": col.replace('_', ' '), "Gap": round((rates.max() - rates.min()) * 100, 1)})
+    gap_data = sorted(gap_rows, key=lambda r: r['Gap'], reverse=True)[:15]
+
     return {
         "overview": {
-            "total_students": len(city_df),
-            "total_dropouts": int(city_df['Will_Dropout'].sum())
+            "total_students": total_students,
+            "total_dropouts": total_dropouts,
+            "dropout_rate": dropout_rate
         },
         "charts": {
             "gender": gen[['gender', 'Safe', 'Dropout']].to_dict(orient='records'),
             "region": reg[['region', 'Safe', 'Dropout']].to_dict(orient='records'),
+            "region_share": reg_share.to_dict(orient='records'),
             "income": inc[['income', 'DropoutRate']].to_dict(orient='records'),
-            "education": edu[['education', 'DropoutRate']].to_dict(orient='records')
+            "parent_education": parent_edu_data,
+            "attendance": attendance_data,
+            "distance": distance_data,
+            "marks": marks_data,
+            "siblings": siblings_data,
+            "attribute_gap": gap_data
         }
     }

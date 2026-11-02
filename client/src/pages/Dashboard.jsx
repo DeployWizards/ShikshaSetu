@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { 
+import { Printer } from 'lucide-react';
+import { printAsPdf } from '../utils/printPdf';
+import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   PieChart, Pie, Cell, AreaChart, Area, LineChart, Line, ReferenceLine
 } from 'recharts';
@@ -73,26 +75,41 @@ const Dashboard = () => {
 
   return (
     <div className="w-full pb-10">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">Analytics Overview</h1>
-        <p className="text-gray-500 mt-1">Real-time analysis based on {kpi.total_students} student records from Uttar Pradesh</p>
+      {/* Print-only report header (shown only on the printed PDF) */}
+      <div className="hidden print:block mb-4">
+        <h1 className="text-2xl font-bold text-gray-900">Analytics Overview Report</h1>
+        <p className="text-sm text-gray-500">Student dropout analytics · Uttar Pradesh</p>
+        <hr className="mt-2 border-gray-300" />
+      </div>
+
+      <div className="mb-8 flex flex-col md:flex-row md:justify-between md:items-start gap-4 print:hidden">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-800">Analytics Overview</h1>
+          <p className="text-gray-500 mt-1">Real-time analysis based on {kpi.total_students} student records from Uttar Pradesh</p>
+        </div>
+        <button
+          onClick={printAsPdf}
+          className="no-print flex items-center gap-2 text-sm font-bold text-blue-600 bg-blue-50 px-4 py-2 rounded-lg hover:bg-blue-100 transition self-start"
+        >
+          <Printer size={16} /> Print as PDF
+        </button>
       </div>
       
       {/* --- KPI CARDS (Real Data) --- */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 border-l-4 border-l-blue-500 hover:shadow-md transition">
+        <div className="print-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 border-l-4 border-l-blue-500 hover:shadow-md transition">
           <h3 className="text-gray-500 text-xs font-bold uppercase tracking-wider">Total Students Analyzed</h3>
           <p className="text-3xl font-bold text-gray-800 mt-2">{kpi.total_students.toLocaleString()}</p>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 border-l-4 border-l-red-500 hover:shadow-md transition">
+        <div className="print-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 border-l-4 border-l-red-500 hover:shadow-md transition">
           <h3 className="text-gray-500 text-xs font-bold uppercase tracking-wider">Historical Dropouts</h3>
           <p className="text-3xl font-bold text-red-600 mt-2">{kpi.total_dropouts.toLocaleString()}</p>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 border-l-4 border-l-orange-500 hover:shadow-md transition">
+        <div className="print-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 border-l-4 border-l-orange-500 hover:shadow-md transition">
           <h3 className="text-gray-500 text-xs font-bold uppercase tracking-wider">Overall Dropout Rate</h3>
           <p className="text-3xl font-bold text-orange-600 mt-2">{kpi.dropout_rate}%</p>
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 border-l-4 border-l-green-500 hover:shadow-md transition">
+        <div className="print-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 border-l-4 border-l-green-500 hover:shadow-md transition">
           <h3 className="text-gray-500 text-xs font-bold uppercase tracking-wider">Model Accuracy</h3>
           <p className="text-3xl font-bold text-green-600 mt-2">{kpi.accuracy}%</p>
         </div>
@@ -102,7 +119,7 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         
         {/* 1. District-wise Bar Chart */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <div className="print-card bg-white p-6 rounded-xl shadow-sm border border-gray-100">
           <h2 className="text-lg font-bold text-gray-700 mb-4">District-wise Dropout Distribution</h2>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
@@ -120,7 +137,7 @@ const Dashboard = () => {
         </div>
 
         {/* 2. Income Area Chart */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <div className="print-card bg-white p-6 rounded-xl shadow-sm border border-gray-100">
           <h2 className="text-lg font-bold text-gray-700 mb-4">Impact of Family Income on Dropout Rate</h2>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
@@ -142,7 +159,7 @@ const Dashboard = () => {
         </div>
 
         {/* 3. Gender Comparison Bar Chart */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <div className="print-card print-break-before bg-white p-6 rounded-xl shadow-sm border border-gray-100">
           <h2 className="text-lg font-bold text-gray-700 mb-4">Gender Disparity in Education Continuity</h2>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
@@ -160,7 +177,7 @@ const Dashboard = () => {
         </div>
 
         {/* 4. Urban vs Rural Donut Chart */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <div className="print-card bg-white p-6 rounded-xl shadow-sm border border-gray-100">
           <h2 className="text-lg font-bold text-gray-700 mb-4">Dropout Concentration (Urban vs Rural)</h2>
           <div className="h-72 relative">
             <ResponsiveContainer width="100%" height="100%">
@@ -201,7 +218,7 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
 
         {/* 5. Attendance */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <div className="print-card bg-white p-6 rounded-xl shadow-sm border border-gray-100">
           <h2 className="text-lg font-bold text-gray-700 mb-1">Attendance vs Dropout Rate</h2>
           <p className="text-xs text-gray-500 mb-4">Below 60% attendance, roughly every second student drops out.</p>
           <div className="h-80">
@@ -210,7 +227,7 @@ const Dashboard = () => {
         </div>
 
         {/* 6. Distance */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <div className="print-card bg-white p-6 rounded-xl shadow-sm border border-gray-100">
           <h2 className="text-lg font-bold text-gray-700 mb-1">Distance to School vs Dropout Rate</h2>
           <p className="text-xs text-gray-500 mb-4">Dropout risk triples once the school is more than 10 km away.</p>
           <div className="h-80">
@@ -219,7 +236,7 @@ const Dashboard = () => {
         </div>
 
         {/* 7. Class 11 marks */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <div className="print-card print-break-before bg-white p-6 rounded-xl shadow-sm border border-gray-100">
           <h2 className="text-lg font-bold text-gray-700 mb-1">Class 11 Marks vs Dropout Rate</h2>
           <p className="text-xs text-gray-500 mb-4">Students scoring below 45% are about twice as likely to drop out.</p>
           <div className="h-80">
@@ -237,7 +254,7 @@ const Dashboard = () => {
         </div>
 
         {/* 8. Siblings */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <div className="print-card bg-white p-6 rounded-xl shadow-sm border border-gray-100">
           <h2 className="text-lg font-bold text-gray-700 mb-1">Number of Siblings vs Dropout Rate</h2>
           <p className="text-xs text-gray-500 mb-4">Families with 3 or more children see a sharp jump in dropouts.</p>
           <div className="h-80">
@@ -246,7 +263,7 @@ const Dashboard = () => {
         </div>
 
         {/* 9. Parents' education */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <div className="print-card bg-white p-6 rounded-xl shadow-sm border border-gray-100">
           <h2 className="text-lg font-bold text-gray-700 mb-1">Parents' Education vs Dropout Rate</h2>
           <p className="text-xs text-gray-500 mb-4">Risk is highest when a parent is illiterate; beyond 10th pass it levels off.</p>
           <div className="h-80">
@@ -266,15 +283,15 @@ const Dashboard = () => {
         </div>
 
         {/* 10. Which attributes matter */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <div className="print-card bg-white p-6 rounded-xl shadow-sm border border-gray-100">
           <h2 className="text-lg font-bold text-gray-700 mb-1">Which Attributes Matter Most?</h2>
           <p className="text-xs text-gray-500 mb-4">Gap between the highest- and lowest-risk group of each attribute, in percentage points.</p>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={charts.attribute_gap} layout="vertical" margin={{ top: 5, right: 30, left: 60, bottom: 5 }}>
+              <BarChart data={charts.attribute_gap} layout="vertical" margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E5E7EB" />
                 <XAxis type="number" unit=" pts" tick={{fill: '#6B7280', fontSize: 12}} />
-                <YAxis dataKey="attribute" type="category" tick={{fill: '#6B7280', fontSize: 11}} width={110} interval={0} />
+                <YAxis dataKey="attribute" type="category" tick={{fill: '#6B7280', fontSize: 11}} width={190} interval={0} />
                 <Tooltip cursor={{fill: '#F3F4F6'}} formatter={(v) => [`${v} percentage points`, 'Gap']} />
                 <Bar dataKey="Gap" fill="#6366F1" barSize={14} radius={[0, 4, 4, 0]} />
               </BarChart>

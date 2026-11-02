@@ -145,7 +145,11 @@ const BulkUpload = () => {
               <thead>
                 <tr className="bg-gray-100 text-gray-600 text-sm uppercase tracking-wider">
                   <th className="p-4 font-bold">Student ID</th>
+                  <th className="p-4 font-bold">Gender</th>
+                  <th className="p-4 font-bold">Region</th>
+                  <th className="p-4 font-bold">Stream</th>
                   <th className="p-4 font-bold">Attendance</th>
+                  <th className="p-4 font-bold">Class 11 %</th>
                   <th className="p-4 font-bold">Family Income</th>
                   <th className="p-4 font-bold">AI Probability</th>
                   <th className="p-4 font-bold">Risk Status</th>
@@ -155,7 +159,11 @@ const BulkUpload = () => {
                 {results.results.map((student, index) => (
                   <tr key={index} className={`hover:bg-gray-50 transition-colors ${getRowColor(student.prediction)}`}>
                     <td className="p-4 font-bold text-gray-800">{student.id}</td>
+                    <td className="p-4 text-gray-600">{student.gender}</td>
+                    <td className="p-4 text-gray-600">{student.region}</td>
+                    <td className="p-4 text-gray-600">{student.stream}</td>
                     <td className="p-4 text-gray-600">{student.attendance}%</td>
+                    <td className="p-4 text-gray-600">{student.class_11}%</td>
                     <td className="p-4 text-gray-600">{student.income}</td>
                     <td className="p-4 font-bold text-gray-800">{student.probability}%</td>
                     <td className="p-4 font-bold">
