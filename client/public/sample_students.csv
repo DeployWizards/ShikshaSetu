@@ -17,5 +17,5 @@ STU_015,Female,Urban,6.0,2,3-5 Lakhs,12th Pass,10th Pass,Yes,Commerce,68.0,65.0,
 STU_016,Male,Rural,13.0,3,1-3 Lakhs,Illiterate,10th Pass,Yes,Commerce,52.0,49.0,53.0
 STU_017,Male,Rural,12.0,3,1-3 Lakhs,10th Pass,Illiterate,No,Science,55.0,50.0,55.0
 STU_018,Female,Rural,8.0,2,1-3 Lakhs,10th Pass,10th Pass,No,Arts,60.0,58.0,68.0
-STU_019,Male,Urban,1.5,0,> 5 Lakhs,Graduate,Graduate,Yes,Science,95.0,93.0,98.0
+STU_019,Male,Rural,1.5,0,1-3 Lakhs,Graduate,Graduate,No,Science,95.0,93.0,78.0
 STU_020,Female,Rural,19.0,5,< 1 Lakh,Illiterate,Illiterate,No,Arts,41.0,37.0,34.0
