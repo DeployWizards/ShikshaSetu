@@ -6,12 +6,11 @@ import {
   PieChart, Pie, Cell, AreaChart, Area, LineChart, Line, ReferenceLine
 } from 'recharts';
 
-// Shared palette (kept identical to the Dashboard so both pages read as one system)
 const COLORS = {
-  safe: '#10B981',   // Emerald Green
-  danger: '#EF4444', // Red
-  urban: '#3B82F6',  // Blue
-  rural: '#F59E0B',  // Amber/Orange
+  safe: '#10B981',   
+  danger: '#EF4444', 
+  urban: '#3B82F6',  
+  rural: '#F59E0B',  
 };
 
 // Dropout rate per group; bars above the city's overall rate are red, the rest green
@@ -138,7 +137,7 @@ const CityAnalytics = () => {
             </div>
           </div>
 
-          {/* --- CHARTS GRID (same style as the main Dashboard) --- */}
+          {/* --- CHARTS GRID --- */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
 
             {/* 1. Gender */}
@@ -231,7 +230,7 @@ const CityAnalytics = () => {
 
           </div>
 
-          {/* --- ATTRIBUTE-WISE ANALYSIS (city-scoped, same as Dashboard) --- */}
+          {/* --- ATTRIBUTE-WISE ANALYSIS --- */}
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-gray-800">Attribute-wise Dropout Analysis</h2>
             <p className="text-gray-500 mt-1">

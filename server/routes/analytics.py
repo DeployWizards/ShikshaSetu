@@ -69,7 +69,7 @@ def get_dashboard_analytics():
     reg.columns = ['name', 'value']
     reg['value'] = round((reg['value'] / total_dropouts) * 100, 1)
     
-    # 4. Gender Stats (THIS WAS MISSING!)
+    # 4. Gender Stats 
     gen = df.groupby('Gender')['Will_Dropout'].agg(['count', 'sum']).reset_index()
     gen.columns = ['gender', 'Total', 'Dropout']
     gen['Safe'] = gen['Total'] - gen['Dropout']
@@ -81,7 +81,7 @@ def get_dashboard_analytics():
     marks_data = dropout_rate_by(banded('Class_11_Percentage'))
     siblings_data = dropout_rate_by('No_of_Siblings')
 
-    # 9. Father vs Mother education, side by side
+    # 9. Father vs Mother education
     edu_order = ['Illiterate', '10th Pass', '12th Pass', 'Graduate']
     father = {d['group']: d['DropoutRate'] for d in dropout_rate_by('Father_Education', edu_order)}
     mother = {d['group']: d['DropoutRate'] for d in dropout_rate_by('Mother_Education', edu_order)}
@@ -162,7 +162,7 @@ def get_city_analytics(city_name: str):
     inc['order'] = inc['income'].map(income_order)
     inc = inc.sort_values('order')
 
-    # 4. Parents' education (Father vs Mother), side by side
+    # 4. Parents' education (Father vs Mother)
     edu_order = ['Illiterate', '10th Pass', '12th Pass', 'Graduate']
     father = {d['group']: d['DropoutRate'] for d in dropout_rate_by('Father_Education', edu_order, frame=city_df)}
     mother = {d['group']: d['DropoutRate'] for d in dropout_rate_by('Mother_Education', edu_order, frame=city_df)}

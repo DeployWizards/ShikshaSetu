@@ -23,11 +23,11 @@ const RateBarChart = ({ data, avg, xLabel }) => (
 );
 
 const Dashboard = () => {
-  // State to hold the real data from Backend
+  // State to hold the data from Backend
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch real data from FastAPI when the component loads
+  // Fetch data from FastAPI when the component loads
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
@@ -46,14 +46,13 @@ const Dashboard = () => {
 
   // Colors for charts
   const COLORS = {
-    safe: '#10B981', // Emerald Green
-    danger: '#EF4444', // Red
-    urban: '#3B82F6', // Blue
-    rural: '#F59E0B', // Amber/Orange
+    safe: '#10B981', 
+    danger: '#EF4444', 
+    urban: '#3B82F6', 
+    rural: '#F59E0B', 
   };
   const PIE_COLORS = [COLORS.rural, COLORS.urban];
 
-  // Show a loading screen while data is being fetched
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full w-full">
@@ -95,7 +94,7 @@ const Dashboard = () => {
         </button>
       </div>
       
-      {/* --- KPI CARDS (Real Data) --- */}
+      {/* --- KPI CARDS --- */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div className="print-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 border-l-4 border-l-blue-500 hover:shadow-md transition">
           <h3 className="text-gray-500 text-xs font-bold uppercase tracking-wider">Total Students Analyzed</h3>
@@ -115,7 +114,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* --- CHARTS GRID (Real Data) --- */}
+      {/* --- CHARTS GRID --- */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         
         {/* 1. District-wise Bar Chart */}
@@ -209,7 +208,7 @@ const Dashboard = () => {
 
       </div>
 
-      {/* --- ATTRIBUTE-WISE ANALYSIS (Real Data) --- */}
+      {/* --- ATTRIBUTE-WISE ANALYSIS --- */}
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-gray-800">Attribute-wise Dropout Analysis</h2>
         <p className="text-gray-500 mt-1">Dropout rate within each group. Red bars are above the overall rate of {kpi.dropout_rate}%.</p>

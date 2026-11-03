@@ -5,9 +5,9 @@ import os
 
 from routes import predict, analytics
 
-app = FastAPI(title="ShikshaSetu Enterprise API")
+app = FastAPI(title="Dropout Risk Prediction API")
 
-# Setup CORS
+# Allow the React frontend to call this API
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"], 
@@ -15,10 +15,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-# Register Routers
+# Serve EDA plots from ml_model/visualizations at /static
 viz_path = os.path.join(os.path.dirname(__file__), '..', 'ml_model', 'visualizations')
 app.mount("/static", StaticFiles(directory=viz_path), name="static")
-# -----------------------------------------------------------------------------
 
 # Register Routers
 app.include_router(predict.router, tags=["Prediction endpoints"])
@@ -26,4 +25,4 @@ app.include_router(analytics.router, tags=["Analytics endpoints"])
 
 @app.get("/")
 def home():
-    return {"message": "ShikshaSetu Modular API is running perfectly!"}
+    return {"message": "Dropout Risk Prediction API is running perfectly!"}

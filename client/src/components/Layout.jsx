@@ -7,7 +7,7 @@ const Layout = () => {
       <div className="no-print">
         <Sidebar />
       </div>
-      {/* Main Content Area - margin-left (ml-64) because sidebar is fixed with width 64 (16rem) */}
+      {/* Main Content Area */}
       <div className="flex-1 ml-64 p-8 print-root">
         <Outlet /> 
       </div>

@@ -11,20 +11,20 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.compose import ColumnTransformer
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report, confusion_matrix, ConfusionMatrixDisplay
 
-# All 6 Algorithms from the PDF
+# ML Algorithms 
 from sklearn.naive_bayes import GaussianNB
 from sklearn.linear_model import LogisticRegression, Perceptron
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 
-# Imbalanced Learn for SMOTE (Because our real data is imbalanced)
+# Because our real data is imbalanced
 from imblearn.over_sampling import SMOTE
 from imblearn.pipeline import Pipeline as ImbPipeline
 
 print("Loading data and setting up preprocessing...")
 
-# 1. Load Data
+# Load Data
 df = pd.read_csv("up_student_dropout_data.csv")
 
 other_features = [
@@ -42,21 +42,21 @@ X = df.drop(columns=['Student_ID', 'City', 'Will_Dropout'] + other_features)
 y = df['Will_Dropout']
 
 
-# 2. Setup Columns
+# Setup Columns
 categorical_cols = ['Gender', 'Region', 'Family_Income', 'Father_Education', 'Mother_Education', 'Internet_Access', 'Stream']
 numerical_cols = ['Distance_km', 'No_of_Siblings', 'Class_10_Percentage', 'Class_11_Percentage', 'Attendance_Percentage']
 
-# 3. Preprocessor (Note: sparse_output=False is required for GaussianNB to work properly)
+# Preprocessing (Here sparse_output=False is required for GaussianNB to work properly)
 preprocessor = ColumnTransformer(
     transformers=[
         ('num', StandardScaler(), numerical_cols),
         ('cat', OneHotEncoder(handle_unknown='ignore', sparse_output=False), categorical_cols)
     ])
 
-# 4. Train/Test Split
+# Train/Test Split
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 
-# 5. Define the 6 Models exactly like the PDF
+# Define the 6 Models 
 classifiers = {
     "Gaussian Naive Bayes": GaussianNB(),
     "Logistic Regression": LogisticRegression(max_iter=1000, random_state=42),
@@ -80,7 +80,7 @@ print("\n" + "="*50)
 print("TRAINING MODELS & GENERATING CONFUSION MATRICES")
 print("="*50)
 
-# 6. Loop through all models, Train, Evaluate, and Plot
+# Loop through all models, Train, Evaluate, and Plot
 for name, clf in classifiers.items():
     print(f"\nTraining {name}...")
     
@@ -118,7 +118,7 @@ for name, clf in classifiers.items():
         best_model_name = name
         best_model_pipeline = pipeline
 
-    # Plot Confusion Matrix (Like PDF)
+    # Plot Confusion Matrix 
     cm = confusion_matrix(y_test, y_pred)
     plt.figure(figsize=(6, 5))
     disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=['Continue', 'Dropout'])
@@ -127,7 +127,7 @@ for name, clf in classifiers.items():
     plt.savefig(f"{output_dir}/{name.replace(' ', '_')}_CM.png")
     plt.close()
 
-# 7. Final Model Comparison Bar Chart (Like Page 33 of PDF)
+# Final Model Comparison Bar Chart 
 print("\nGenerating Accuracy Comparison Chart...")
 plt.figure(figsize=(10, 6))
 # Sort models by accuracy for better visualization
@@ -143,8 +143,7 @@ plt.tight_layout()
 plt.savefig(f"{output_dir}/Final_Model_Comparison.png")
 plt.close()
 
-# 8. Save the absolute best model for FastAPI
-# Note: We save it one folder up (in server directory) so the backend can use it directly!
+# 8. Save the absolute best model for FastAPI in server directory so the backend can use it directly!
 try:
     joblib.dump(best_model_pipeline, '../server/dropout_model.pkl')
     print(f"\nSaved Best Model ({best_model_name}) to server folder successfully!")

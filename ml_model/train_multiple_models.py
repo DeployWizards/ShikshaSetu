@@ -48,7 +48,7 @@ preprocessor = ColumnTransformer(
 # 5. Split the data
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 
-# 6. Define the Dictionary of Optimized Base Classifiers (Removed Decision Tree)
+# 6. Define the Dictionary of Optimized Base Classifiers 
 classifiers = {
     "Logistic Regression": LogisticRegression(class_weight='balanced', max_iter=1000, random_state=42),
     "Random Forest": RandomForestClassifier(n_estimators=200, max_depth=10, random_state=42),

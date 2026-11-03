@@ -5,8 +5,6 @@ import {
 } from 'lucide-react';
 
 const Prediction = () => {
-  // Now we take ALL 12 inputs from the user, NO dummy data!
-  // Form starts empty; every field is required before submitting.
   const [formData, setFormData] = useState({
     Gender: '',
     Region: '',
@@ -25,7 +23,6 @@ const Prediction = () => {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Numeric fields stay as strings while typing (so they can be empty) and are converted on submit
   const numericFields = ['Distance_km', 'No_of_Siblings', 'Class_10_Percentage', 'Class_11_Percentage', 'Attendance_Percentage'];
 
   const handleChange = (e) => {
@@ -40,7 +37,6 @@ const Prediction = () => {
     const payload = { ...formData };
     numericFields.forEach((f) => { payload[f] = Number(payload[f]); });
     try {
-      // Sending real user input to FastAPI Backend
       const response = await fetch('http://127.0.0.1:8000/predict', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

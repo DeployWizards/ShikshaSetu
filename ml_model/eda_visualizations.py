@@ -6,14 +6,14 @@ import os
 
 print("Starting Exploratory Data Analysis (EDA)...")
 
-# 1. Load Data
+# Load Data
 df = pd.read_csv("up_student_dropout_data.csv")
 
 # Create a folder to save graphs if it doesn't exist
 output_dir = "visualizations"
 os.makedirs(output_dir, exist_ok=True)
 
-# 2. Target Variable Pie Chart (Like Page 9 of PDF)
+# 2. Target Variable Pie Chart 
 plt.figure(figsize=(8, 8))
 plt.title("Student Dropout Status Distribution")
 dropout_counts = df['Will_Dropout'].value_counts()
@@ -23,7 +23,7 @@ plt.savefig(f"{output_dir}/1_target_distribution.png")
 plt.close()
 print("- Saved Target Distribution Pie Chart")
 
-# 3. Countplot: Dropout by Gender (Like Page 10 of PDF)
+# 3. Countplot: Dropout by Gender
 plt.figure(figsize=(8, 6))
 sns.countplot(data=df, x='Will_Dropout', hue='Gender', palette='Set2')
 plt.title("Dropout Count by Gender")
@@ -32,7 +32,7 @@ plt.savefig(f"{output_dir}/2_gender_vs_dropout.png")
 plt.close()
 print("- Saved Gender vs Dropout Countplot")
 
-# 4. Distribution Plot of Attendance (Like Page 7/8 of PDF)
+# 4. Distribution Plot of Attendance
 plt.figure(figsize=(10, 5))
 sns.histplot(df[df['Will_Dropout'] == 1]['Attendance_Percentage'], color="red", label="Dropout", kde=True, stat="density", linewidth=0)
 sns.histplot(df[df['Will_Dropout'] == 0]['Attendance_Percentage'], color="green", label="Continue", kde=True, stat="density", linewidth=0)
@@ -42,7 +42,7 @@ plt.savefig(f"{output_dir}/3_attendance_distribution.png")
 plt.close()
 print("- Saved Attendance Distribution Plot")
 
-# 5. Correlation Heatmap (Like Page 19 of PDF)
+# 5. Correlation Heatmap
 # To find correlation, we must convert categorical strings to numbers temporarily
 df_encoded = df.copy()
 le = LabelEncoder()

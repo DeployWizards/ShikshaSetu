@@ -1,4 +1,3 @@
-from fastapi import APIRouter
 from pydantic import BaseModel
 import pandas as pd
 from services.ml_service import get_model

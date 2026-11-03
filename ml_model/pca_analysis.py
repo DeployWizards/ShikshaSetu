@@ -26,9 +26,7 @@ X_processed = scaler.fit_transform(X_encoded)
 output_dir = "visualizations"
 os.makedirs(output_dir, exist_ok=True)
 
-# ---------------------------------------------------------
 # Dimensionality Reduction (PCA)
-# ---------------------------------------------------------
 pca = PCA()
 pca.fit(X_processed)
 
@@ -56,9 +54,7 @@ plt.tight_layout()
 plt.savefig(f"{output_dir}/5_pca_variance_plot.png", dpi=300)
 plt.close()
 
-# ---------------------------------------------------------
 # Feature Importance Analysis
-# ---------------------------------------------------------
 rf = RandomForestClassifier(n_estimators=200, max_depth=5, min_samples_split=20, random_state=42)
 rf.fit(X_processed, y)
 

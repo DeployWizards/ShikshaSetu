@@ -17,9 +17,7 @@ data = []
 print("Generating high-dimensional synthetic dataset (35 features) for PCA Analysis...")
 
 for i in range(NUM_STUDENTS):
-    # ---------------------------------------------------------
-    # 1. CORE FEATURES (High Importance for Dropout)
-    # ---------------------------------------------------------
+    # CORE FEATURES (High Importance for Dropout)
     student_id = f"UP12_{10000 + i}"
     city = random.choice(up_cities)
     gender = random.choices(["Male", "Female"], weights=[0.55, 0.45])[0]
@@ -44,7 +42,7 @@ for i in range(NUM_STUDENTS):
     peer_support = random.choices(["High", "Medium", "Low"], weights=[0.3, 0.5, 0.2])[0]
     school_counselling = random.choice(["Yes", "No"])
     
-    # Extra generated features to inflate dimensions (Habits & Environment)
+    # Extra generated features (Habits & Environment)
     sleep_hours = round(np.clip(np.random.normal(7, 1.5), 4, 10), 1)
     screen_time_hours = round(np.clip(np.random.normal(4, 2), 1, 8), 1)
     water_intake_liters = round(random.uniform(1.0, 4.0), 1)
@@ -62,9 +60,7 @@ for i in range(NUM_STUDENTS):
     participates_in_festivals = random.choice(["Yes", "No"])
     school_building_quality = random.choices(["New", "Old but Maintained", "Needs Repair"], weights=[0.3, 0.5, 0.2])[0]
 
-    # ---------------------------------------------------------
-    # 3. CALCULATING TARGET 
-    # ---------------------------------------------------------
+    # CALCULATING TARGET 
     risk_score = 0
     
     # Core logical rules
@@ -77,7 +73,7 @@ for i in range(NUM_STUDENTS):
     if internet_access == "No": risk_score += 1
     if gender == "Female" and distance_km > 12: risk_score += 2 
     
-    # Adding a TINY bit of weight to a few new features so correlation isn't exactly 0.00
+    # # Small weights so a few secondary features carry a weak signal
     if scholarship == "Yes": risk_score -= 0.5
     if school_counselling == "No" and peer_support == "Low": risk_score += 0.5
     

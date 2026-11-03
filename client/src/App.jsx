@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import Prediction from './pages/Prediction';
-import CityAnalytics from './pages/CityAnalytics'; // Import new page
+import CityAnalytics from './pages/CityAnalytics'; 
 import BulkUpload from './pages/BulkUpload';
 import MLReports from './pages/MLReports';
 function App() {

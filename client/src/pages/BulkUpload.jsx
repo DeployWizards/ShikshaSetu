@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { UploadCloud, FileText, Download, CheckCircle, AlertTriangle, AlertCircle } from 'lucide-react';
+import { Printer } from 'lucide-react';
 
+const printAsPdf = () => {
+  window.print();
+};
 const BulkUpload = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [results, setResults] = useState(null);
@@ -176,6 +180,14 @@ const BulkUpload = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+          <div className="flex justify-center p-6 no-print">
+            <button
+              onClick={printAsPdf}
+              className="flex items-center gap-2 text-sm font-bold text-blue-600 bg-blue-50 px-4 py-2 rounded-lg hover:bg-blue-100 transition"
+            >
+              <Printer size={16} /> Print as PDF
+            </button>
           </div>
         </div>
       )}

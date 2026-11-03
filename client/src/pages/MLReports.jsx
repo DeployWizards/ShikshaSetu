@@ -57,7 +57,7 @@ const MLReports = () => {
         </div>
       )}
 
-      {/* 2. Feature Engineering & PCA Section (NEW) */}
+      {/* 2. Feature Engineering & PCA Section */}
       {activeTab === 'pca' && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
